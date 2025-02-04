@@ -1,7 +1,50 @@
 # A Linear View of Discriminative and Generative Models
+
 **Generative Models:** Model the joint distribution, $P(X, Y)$. They aim to model the underlying data distribution 
 **Discriminative models:** Models the conditional distribution, $P(Y \mid X)$. They focus on just distinguishing between different classes. 
 
 ### The discriminative and Generative Path to $P(Y \mid X)$: 
 Both Discriminitve and generative models end at $P(Y \mid X)$ but they get there in different ways. 
-**Generative Models** Observe X and Y, then learn $P(X \mid Y)$, $P(Y)$ and calculate $P(X) = \int P(X, Y) \, dY$. Then, use these to calcualate $P(Y|X) = \frac{P(Y, X)}{P(X)}$
+
+**Generative Models** Observe X and Y, then learn $P(X \mid Y)$, $P(Y)$ and calculate $P(X) = \int P(X, Y) \, dY$. Then, use these to calcualate $P(Y|X) = \frac{P(Y, X)}{P(X)}$. 
+When looking to calculate $\hat{Y}$, we just need to learn $P(X \mid Y)$ and $P(Y)$. Then we can calculate $\hat{Y} = \arg\max P(X | Y) \cdot P(Y)$
+
+**Discriminitive Models** Observe X and Y, and then learn P(Y|X). It is a more straightforward approach, but you do not learn as much about X, Y and their distributions.
+Similarily, if we are looking to get $\hat{Y}$ from observing X and Y, we can learn $P(Y|X)$ and use it calculate $\hat{Y} = \arg\max P(Y | X)$
+
+### Example Discriminative Model - Logistic Regression:
+Our goal here is to observe X and Y and from them learn $P(Y \mid X)$. We do this through Parameterization: 
+- $P(Y = 1 | X) = \sigma(\theta^T X)$, where $\sigma(z) = \frac{1}{1 + e^{-z}}$ is the sigmoid function.
+- $P(Y = 0 | X) = 1 - P(Y = 1 | X)$
+
+**Why do we do this parameterization?**
+If we take the log-odds and simplify, we get: $\log \left( \frac{P(Y = 0 | X)}{P(Y = 1 | X)} \right) = \theta^T X$ 
+This provides a linear relationship between the input features X and the log-odds of the outcome Y. By using the sigmoid function, we map this linear relationship to the probability space, 
+ensuring that the predicted probability lies between 0 and 1.
+
+Using these paramterizations, we can calculate $\hat{\theta}$ from observations of X and Y in our data: 
+$$
+\theta = \arg \max \prod_{i} P(Y_i | X_i; \theta) = \arg \max \sum_{i} \left[ Y_i \log \sigma(\theta^T X_i) + (1 - Y_i) \log(1 - \sigma(\theta^T X_i)) \right]
+$$
+
+### Example Generative Model - Naive Bayes:
+Our goal here is to observe X and Y and from then then learn $P(X \mid Y)$, $P(Y)$ and calculate $P(X) = \int P(X, Y) \, dY$. Then, use these to calcualate $P(Y|X) = \frac{P(Y, X)}{P(X)}$.
+We do this through Parameterization: 
+- $P(X | Y) = \prod_{j=1}^{d} P(X_j | Y)$
+- $P(Y = k) = \frac{\text{# of samples with } Y = k}{\text{total samples}}$
+- $$ P(X_j | Y) = N(\mu_{jk}, \sigma_{jk}^2) $$
+
+**A note on this parameterization?**
+This is making the assumption of condtional Independence of the features in $X_1, X_2, \dots, X_n$ given the class label Y. This allows it to simplify the join probability as the product of individual feature 
+probabilities, as is shown in the first bullet. This assumption is why it is the "Naive" Bayes.
+
+
+Using these paramterizations, we can calculate $\hat{\mu}, \hat{\sigma}$ and from observations of X and Y in our data: 
+$$
+\hat{\mu}, \hat{\sigma} = \arg \max_{\mu, \sigma} P(X | Y)
+$$
+$$
+P(Y = 1 | X) = \frac{\prod_{j=1}^{d} P(X_j | Y=1) P(Y=1)}{P(X)}
+$$
+
+### What about MAP/Regularization:
