@@ -24,7 +24,7 @@ ensuring that the predicted probability lies between 0 and 1.
 
 Using these paramterizations, we can calculate $\hat{\theta}$ from observations of X and Y in our data: 
 $$
-\theta = \arg \max \prod_{i} P(Y_i | X_i; \theta) = \arg \max \sum_{i} \left[ Y_i \log \sigma(\theta^T X_i) + (1 - Y_i) \log(1 - \sigma(\theta^T X_i)) \right]
+\hat{\theta} = \arg \max \prod_{i} P(Y_i | X_i; \theta) = \arg \max \sum_{i} \left[ Y_i \log \sigma(\theta^T X_i) + (1 - Y_i) \log(1 - \sigma(\theta^T X_i)) \right]
 $$
 
 ### Example Generative Model - Naive Bayes:
@@ -48,3 +48,45 @@ P(Y = 1 | X) = \frac{\prod_{j=1}^{d} P(X_j | Y=1) P(Y=1)}{P(X)}
 $$
 
 ### What about MAP/Regularization:
+When we observe X and Y and learn $P(Y | X; \sigma)$, $P(\theta)$ in MAP. Our Parameterization stays the same:
+- $P(Y = 1 | X) = \sigma(\theta^T X)$, where $\sigma(z) = \frac{1}{1 + e^{-z}}$ is the sigmoid function.
+- $P(Y = 0 | X) = 1 - P(Y = 1 | X)$
+
+From there, we estimate $\hat{\theta}$ from observations: 
+$$
+\hat{\theta} = \arg \max \prod_{i} P(Y_i | X_i; \theta) P(\theta) = \arg \max_i \sum_{i} \left[ Y_i \log \sigma(\theta^T X_i) + (1 - Y_i) \log(1 - \sigma(\theta^T X_i)) \right] - R(\theta)
+$$
+
+Then, we calaculate $P(Y | X)$
+
+### Discriminitive vs Generative Models:
+Disciminative Models optimize the *conditional* likelihood:
+$$
+\hat{\theta}_{\text{disc}} = \arg \max_{\theta} P(Y | X; \theta) = \arg \max_{\theta} \frac{P(X | Y; \theta) P(Y; \theta)}{P(X; \theta)}
+$$
+Generative Models optimize the *joint* likelihood:
+$\hat{\theta}_{\text{gen}} = \arg \max_{\theta} P(X, Y; \theta) = \arg \max_{\theta} P(X | Y; \theta) P(Y; \theta)$
+
+**Are these the same optimization?**
+Only when $P(X; \theta)$ is invaraiant to $\theta$, as  $\arg \max_{\theta} \frac{P(X | Y; \theta) P(Y; \theta)}{P(X; \theta)} = \arg \max_{\theta} P(X | Y; \theta) P(Y; \theta)$
+
+###Summary of Logistic Regression vs Naive Bayes:
+
+| Model            | Logistic Regression               | Naïve Bayes                |
+|------------------|-----------------------------------|----------------------------|
+| **Defines**      | \( P(Y | X; \theta) \)           | \( P(X, Y; \theta) \)      |
+| **Estimates**    | \( \hat{\theta} = \arg\max P(Y | X; \theta) \) | \( \hat{\theta} = \arg\max P(X, Y; \theta) \) |
+| **Asymptotic Error** | Lower asymptotic error on classification | Higher asymptotic error on classification |
+| **Convergence Speed** | Slower convergence in terms of samples | Faster convergence in terms of samples |
+
+###Andrew Ng's Insights
+
+Discriminative learning generally leads to lower error in the long run, but a generative classifier can reach its higher error rate more quickly as it learns. 
+In other words, while discriminative models may perform better overall, generative models might be able to learn and converge faster, even if they don't 
+ultimately achieve the same level of accuracy. Why is this?
+
+“While discriminative learning has lower asymptotic error, a generative classifier may also approach its (higher) asymptotic error much faster.”
+The assumptions of this statement:
+- Generative models, such as those that estimate \( P(X, Y, \theta) \), typically make more assumptions to simplify the problem compared to discriminative models that focus on \( P(Y | X) \).
+- However, this isn't always the case.
+- Currently, there is no universally correct or general rule for deciding whether to use a discriminative or generative approach to classify an observation \( x \) into a class \( y \); the decision depends on how confident we are in the accuracy of the specification of either \( p(y|x) \) or \( p(x, y) \) for the data.
