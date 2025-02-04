@@ -1,0 +1,7 @@
+# A Linear View of Discriminative and Generative Models
+**Generative Models:** Model the joint distribution, $P(X, Y)$. They aim to model the underlying data distribution 
+**Discriminative models:** Models the conditional distribution, $P(Y \mid X)$. They focus on just distinguishing between different classes. 
+
+### The discriminative and Generative Path to $P(Y \mid X)$: 
+Both Discriminitve and generative models end at $P(Y \mid X)$ but they get there in different ways. 
+**Generative Models** Observe X and Y, then learn $P(X \mid Y)$, $P(Y)$ and calculate $P(X) = \int P(X, Y) \, dY$. Then, use these to calcualate $P(Y|X) = \frac{P(Y, X)}{P(X)}$
